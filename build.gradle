@@ -26,7 +26,7 @@ tasks.withType(JavaCompile) {
 
 application {
   mainModule = 'org.example.reptitrack'
-  mainClass = 'org.example.reptitrack.HelloApplication'
+  mainClass = 'org.example.reptitrack.MainApplication'
 }
 
 javafx {

@@ -1,24 +1,46 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
-<?import javafx.scene.control.TableColumn?>
-<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox xmlns:fx="http://javafx.com/fxml" fx:controller="org.example.reptitrack.MainDashboardController"
-      spacing="10" alignment="TOP_CENTER" prefWidth="600" prefHeight="400">
-    <!-- Placeholder Buttons or Navigation -->
-    <Button text="Animals" />
-    <Button text="Enclosures" />
-    <Button text="Feeders" />
-    <Button text="Supplies" />
+<VBox xmlns:fx="http://javafx.com/fxml"
+      fx:controller="org.example.reptitrack.controllers.MainDashboardController"
+      spacing="10" alignment="TOP_CENTER">
 
-    <!-- TableView for Products -->
-    <TableView fx:id="productTable" prefHeight="300" prefWidth="580">
-        <columns>
-            <TableColumn fx:id="nameColumn" text="Name" prefWidth="200" />
-            <TableColumn fx:id="quantityColumn" text="Quantity" prefWidth="100" />
-        </columns>
-    </TableView>
+    <!-- Title / Heading -->
+    <Label text="ReptiTrack - Main Dashboard" style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
+
+    <!-- Summary Section (e.g., total items, low-stock count) -->
+    <HBox spacing="15">
+        <Label text="Total Items in Inventory:" />
+        <Label fx:id="totalItemsLabel" text="0" style="-fx-font-weight: bold;" />
+    </HBox>
+
+    <HBox spacing="15">
+        <Label text="Low-Stock Alerts:" />
+        <Label fx:id="lowStockLabel" text="None" style="-fx-text-fill: red;" />
+    </HBox>
+
+    <!-- Quick Search Bar -->
+    <HBox spacing="10">
+        <!-- Inset-based padding fix -->
+        <padding>
+            <Insets top="10" right="10" bottom="10" left="10"/>
+        </padding>
+
+        <Label text="Search: " />
+        <TextField fx:id="searchField" promptText="Enter product name..." />
+        <Button text="Search" onAction="#handleSearch"/>
+    </HBox>
+
+    <!-- Button Navigation to Other Screens -->
+    <HBox spacing="10">
+        <Button text="Go to Categories" onAction="#goToCategories"/>
+        <Button text="Go to Checkout" onAction="#goToCheckout"/>
+    </HBox>
+
 </VBox>

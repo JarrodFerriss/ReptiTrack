@@ -1,40 +1,41 @@
-package org.example.reptitrack;
+package org.example.reptitrack.controllers;
 
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.cell.PropertyValueFactory;
-import org.example.reptitrack.models.Product;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+import org.example.reptitrack.MainApplication;
 
 public class MainDashboardController {
 
     @FXML
-    private TableView<Product> productTable;
-
+    private Label totalItemsLabel;
     @FXML
-    private TableColumn<Product, String> nameColumn;
-
+    private Label lowStockLabel;
     @FXML
-    private TableColumn<Product, Integer> quantityColumn;
+    private TextField searchField;
 
-    // An ObservableList to hold dummy data
-    private final ObservableList<Product> productList = FXCollections.observableArrayList();
-
+    // Called automatically after FXML loads
     @FXML
     public void initialize() {
-        // Configure table columns to map to Product fields
-        nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
-        quantityColumn.setCellValueFactory(new PropertyValueFactory<>("quantity"));
+        // Example placeholders:
+        totalItemsLabel.setText("42");     // Replace with actual data from DB
+        lowStockLabel.setText("3 items"); // Or "None" if no low-stock items
+    }
 
-        // Create some dummy Products
-        productList.add(new Product(1, "Corn Snake", 10));
-        productList.add(new Product(2, "Leopard Gecko", 5));
-        productList.add(new Product(3, "Terrarium (Small)", 2));
-        productList.add(new Product(4, "Crickets (50-pack)", 20));
+    @FXML
+    private void handleSearch() {
+        String query = searchField.getText();
+        // In a real app, you'd search your database or product list.
+        System.out.println("Search triggered for: " + query);
+    }
 
-        // Set the ObservableList in the TableView
-        productTable.setItems(productList);
+    @FXML
+    private void goToCategories() {
+        MainApplication.setRoot("Categories"); // We'll show how to do this below
+    }
+
+    @FXML
+    private void goToCheckout() {
+        MainApplication.setRoot("Checkout");
     }
 }
