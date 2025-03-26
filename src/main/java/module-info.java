@@ -1,6 +1,7 @@
 module org.example.reptitrack {
     requires javafx.controls;
     requires javafx.fxml;
+    requires java.sql;
 
 
     opens org.example.reptitrack to javafx.fxml;

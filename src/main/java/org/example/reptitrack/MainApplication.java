@@ -5,8 +5,12 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import org.example.reptitrack.dao.DatabaseConnection;
+import java.sql.Connection;
+import java.sql.SQLException;
 
 import java.io.IOException;
+
 
 public class MainApplication extends Application {
     private static Scene mainScene;
@@ -37,6 +41,15 @@ public class MainApplication extends Application {
     }
 
     public static void main(String[] args) {
+        // **Test Database Connection Before Launching JavaFX**
+        try (Connection conn = DatabaseConnection.getConnection()) {
+            System.out.println("✅ Connected to database: " + conn.getCatalog());
+        } catch (SQLException e) {
+            System.err.println("❌ Database connection failed: " + e.getMessage());
+            System.exit(1);  // Exit the application if database connection fails
+        }
+
+        // **Launch JavaFX Application**
         launch();
     }
 }
