@@ -26,7 +26,7 @@ public class CheckoutView {
 
         // 🛒 Cart Table
         TableView<Product> cartTable = new TableView<>();
-        cartTable.setItems(getMockCart());
+        // cartTable.setItems(getMockCart());
 
         TableColumn<Product, String> productNameCol = new TableColumn<>("Product");
         productNameCol.setCellValueFactory(new PropertyValueFactory<>("name"));
@@ -40,7 +40,7 @@ public class CheckoutView {
         TableColumn<Product, Double> subtotalCol = new TableColumn<>("Subtotal");
         subtotalCol.setCellValueFactory(cellData -> {
             Product product = cellData.getValue();
-            double subtotal = product.getPrice() * product.getQuantity();
+            double subtotal = product.getPrice() * product.getStockQuantity();
             return new SimpleObjectProperty<>(subtotal);
         });
 
@@ -49,7 +49,7 @@ public class CheckoutView {
 
         // 💰 Total Label
         double total = cartTable.getItems().stream()
-                .mapToDouble(p -> p.getPrice() * p.getQuantity())
+                .mapToDouble(p -> p.getPrice() * p.getStockQuantity())
                 .sum();
 
         Label totalLabel = new Label(String.format("Total: $%.2f", total));
@@ -72,13 +72,5 @@ public class CheckoutView {
         layout.setPadding(new Insets(15));
 
         return layout;
-    }
-
-    private static ObservableList<Product> getMockCart() {
-        return FXCollections.observableArrayList(
-                new Product(101, "Reptile Heat Lamp", 2, "Herp Supply Co.", 29.99),
-                new Product(102, "Water Dish", 1, "ReptiCo", 9.99),
-                new Product(103, "Gecko Food Pack", 3, "Lizard Snacks Ltd.", 4.50)
-        );
     }
 }

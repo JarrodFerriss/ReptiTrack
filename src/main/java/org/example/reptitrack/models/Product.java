@@ -5,16 +5,18 @@ package org.example.reptitrack.models;
  * Includes product ID, name, quantity, supplier name, and price.
  */
 public class Product {
-    private int id;
-    private String name;
-    private int quantity;
+    private int id;               // Maps to animal_id, product_id, etc.
+    private String productName;   // Maps to product_name
+    private String category;      // Optional, maps to category
+    private int stockQuantity;    // Maps to stock_quantity
     private String supplier;
     private double price;
 
-    public Product(int id, String name, int quantity, String supplier, double price) {
+    public Product(int id, String productName, String category, int stockQuantity, String supplier, double price) {
         this.id = id;
-        this.name = name;
-        this.quantity = quantity;
+        this.productName = productName;
+        this.category = category;
+        this.stockQuantity = stockQuantity;
         this.supplier = supplier;
         this.price = price;
     }
@@ -24,36 +26,44 @@ public class Product {
         return id;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public String getProductName() {
+        return productName;
     }
 
-    public String getName() {
-        return name;
+    public String getCategory() {
+        return category;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public int getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(int quantity) {
-        this.quantity = quantity;
+    public int getStockQuantity() {
+        return stockQuantity;
     }
 
     public String getSupplier() {
         return supplier;
     }
 
-    public void setSupplier(String supplier) {
-        this.supplier = supplier;
-    }
-
     public double getPrice() {
         return price;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public void setProductName(String productName) {
+        this.productName = productName;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
+    public void setStockQuantity(int stockQuantity) {
+        this.stockQuantity = stockQuantity;
+    }
+
+    public void setSupplier(String supplier) {
+        this.supplier = supplier;
     }
 
     public void setPrice(double price) {

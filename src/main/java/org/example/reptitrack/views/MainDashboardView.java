@@ -7,6 +7,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import org.example.reptitrack.MainApplication;
+import org.example.reptitrack.views.AdminTerminalView;
 
 public class MainDashboardView {
 
@@ -47,7 +48,13 @@ public class MainDashboardView {
         Button checkoutButton = new Button("Go to Checkout");
         checkoutButton.setOnAction(e -> MainApplication.setRoot("Checkout"));
 
-        HBox navigationBox = new HBox(10, categoriesButton, checkoutButton);
+        Button adminButton = new Button("Admin Terminal");
+        adminButton.setOnAction(e -> {
+            Scene adminScene = AdminTerminalView.createAdminScene(stage);
+            stage.setScene(adminScene);
+        });
+
+        HBox navigationBox = new HBox(10, categoriesButton, checkoutButton, adminButton);
 
         VBox layout = new VBox(10, titleLabel, totalItemsBox, lowStockBox, searchBox, navigationBox);
         layout.setAlignment(Pos.TOP_CENTER);

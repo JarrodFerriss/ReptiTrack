@@ -8,6 +8,9 @@ import org.example.reptitrack.views.CategoriesView;
 import org.example.reptitrack.views.CheckoutView;
 import org.example.reptitrack.views.MainDashboardView;
 
+import java.sql.Connection;
+import java.sql.SQLException;
+
 /**
  * Main entry point for the ReptiTrack application.
  * Handles launching the JavaFX application and managing scene switching.
@@ -23,14 +26,22 @@ public class MainApplication extends Application {
         primaryStage = stage;
 
         try {
-            Scene scene = MainDashboardView.createMainScene(stage);
+            // 🌐 Attempt DB connection
+            try (Connection conn = org.example.reptitrack.dao.DatabaseConnection.getConnection()) {
+                System.out.println("✅ Connected to database: " + conn.getCatalog());
+            } catch (SQLException e) {
+                System.err.println("❌ Database connection failed: " + e.getMessage());
+            }
+
+            // 🔐 Start with LoginView instead of Dashboard
+            Scene scene = org.example.reptitrack.views.LoginView.createLoginScene(stage);
             primaryStage.setScene(scene);
-            primaryStage.setTitle("ReptiTrack");
+            primaryStage.setTitle("ReptiTrack - Login");
             primaryStage.show();
 
-            System.out.println("🪟 Application window displayed successfully.");
+            System.out.println("🪟 Login window displayed successfully.");
         } catch (Exception e) {
-            System.err.println("❌ Failed to initialize main scene.");
+            System.err.println("❌ Failed to initialize login scene.");
             e.printStackTrace();
 
             Label fallbackLabel = new Label("Critical Error: Unable to load UI.");
