@@ -27,6 +27,9 @@ public class AddProductView {
         TextField priceField = new TextField();
         priceField.setPromptText("Price");
 
+        TextField minStockField = new TextField();
+        minStockField.setPromptText("Minimum Stock Level");
+
         Label errorLabel = new Label();
         errorLabel.setStyle("-fx-text-fill: red;");
 
@@ -37,8 +40,9 @@ public class AddProductView {
                 int qty = Integer.parseInt(quantityField.getText().trim());
                 String supplier = supplierField.getText().trim();
                 double price = Double.parseDouble(priceField.getText().trim());
+                int minStock = Integer.parseInt(minStockField.getText().trim());
 
-                Product product = new Product(0, name, category, qty, supplier, price);
+                Product product = new Product(0, name, category, qty, supplier, price, minStock);
 
                 switch (category.toLowerCase()) {
                     case "animals" -> AnimalDAO.insertAnimal(product);
@@ -58,7 +62,7 @@ public class AddProductView {
         Button cancelButton = new Button("Cancel");
         cancelButton.setOnAction(e -> stage.setScene(AdminTerminalView.createAdminScene(stage)));
 
-        VBox layout = new VBox(10, titleLabel, nameField, quantityField, supplierField, priceField, errorLabel, saveButton, cancelButton);
+        VBox layout = new VBox(10, titleLabel, nameField, quantityField, supplierField, priceField, minStockField, errorLabel, saveButton, cancelButton);
         layout.setAlignment(Pos.CENTER);
         layout.setPadding(new Insets(20));
         layout.setPrefWidth(400);

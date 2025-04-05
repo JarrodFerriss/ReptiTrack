@@ -11,14 +11,16 @@ public class Product {
     private int stockQuantity;
     private String supplier;
     private double price;
+    private int minStockLevel;
 
-    public Product(int id, String productName, String category, int stockQuantity, String supplier, double price) {
+    public Product(int id, String productName, String category, int stockQuantity, String supplier, double price, int minStockLevel) {
         this.id = id;
         this.productName = productName;
         this.category = category;
         this.stockQuantity = stockQuantity;
         this.supplier = supplier;
         this.price = price;
+        this.minStockLevel = minStockLevel;
     }
 
     // Getters and setters
@@ -46,6 +48,10 @@ public class Product {
         return price;
     }
 
+    public int getMinStockLevel() {
+        return minStockLevel;
+    }
+
     public void setId(int id) {
         this.id = id;
     }
@@ -68,5 +74,9 @@ public class Product {
 
     public void setPrice(double price) {
         this.price = price;
+    }
+
+    public void setMinStockLevel(int minStockLevel) {
+        this.minStockLevel = minStockLevel;
     }
 }

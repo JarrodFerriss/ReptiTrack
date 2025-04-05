@@ -34,7 +34,8 @@ public class ProductDAO {
                         rs.getString("category"),
                         rs.getInt("stock_quantity"),
                         rs.getString("supplier"),
-                        rs.getDouble("price")
+                        rs.getDouble("price"),
+                        rs.getInt("min_stock_level")
                 );
                 products.add(product);
             }
@@ -54,7 +55,7 @@ public class ProductDAO {
      * Inserts a new product into the Products table.
      */
     public static void insertProduct(Product product) {
-        String sql = "INSERT INTO Products (product_name, category, stock_quantity, supplier, price) VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO Products (product_name, category, stock_quantity, supplier, price, min_stock_level) VALUES (?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -64,6 +65,7 @@ public class ProductDAO {
             stmt.setInt(3, product.getStockQuantity());
             stmt.setString(4, product.getSupplier());
             stmt.setDouble(5, product.getPrice());
+            stmt.setInt(6, product.getMinStockLevel());
 
             stmt.executeUpdate();
             System.out.println("✅ Product inserted into Products table.");
@@ -81,7 +83,7 @@ public class ProductDAO {
      * Updates an existing product in the Products table.
      */
     public static void updateProduct(Product product) {
-        String sql = "UPDATE Products SET product_name = ?, category = ?, stock_quantity = ?, supplier = ?, price = ? WHERE product_id = ?";
+        String sql = "UPDATE Products SET product_name = ?, category = ?, stock_quantity = ?, supplier = ?, price = ?, min_stock_level = ? WHERE product_id = ?";
 
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -91,7 +93,8 @@ public class ProductDAO {
             stmt.setInt(3, product.getStockQuantity());
             stmt.setString(4, product.getSupplier());
             stmt.setDouble(5, product.getPrice());
-            stmt.setInt(6, product.getId());
+            stmt.setInt(6, product.getMinStockLevel());
+            stmt.setInt(7, product.getId());
 
             stmt.executeUpdate();
             System.out.println("✅ Product updated in Products table.");

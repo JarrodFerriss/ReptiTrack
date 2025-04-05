@@ -43,7 +43,8 @@ public class AdminTerminalView {
                 createColumn("Category", "category", 100),
                 createColumn("Quantity", "stockQuantity", 100),
                 createColumn("Supplier", "supplier", 150),
-                createColumn("Price", "price", 100)
+                createColumn("Price", "price", 100),
+                createColumn("Min Stock Level", "minStockLevel", 100)
         );
 
         Button addButton = new Button("➕ Add");

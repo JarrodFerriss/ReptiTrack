@@ -31,10 +31,11 @@ public class AnimalDAO {
                 Product product = new Product(
                         rs.getInt("animal_id"),
                         rs.getString("product_name"),
-                        "Animals", // Explicit category
+                        "Animals",
                         rs.getInt("stock_quantity"),
                         rs.getString("supplier"),
-                        rs.getDouble("price")
+                        rs.getDouble("price"),
+                        rs.getInt("min_stock_level")
                 );
                 animals.add(product);
             }
@@ -54,7 +55,7 @@ public class AnimalDAO {
      * Inserts a new animal product and syncs with Products.
      */
     public static void insertAnimal(Product product) {
-        String sql = "INSERT INTO Animals (product_name, category, stock_quantity, supplier, price) VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO Animals (product_name, category, stock_quantity, supplier, price, min_stock_level) VALUES (?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -64,6 +65,7 @@ public class AnimalDAO {
             stmt.setInt(3, product.getStockQuantity());
             stmt.setString(4, product.getSupplier());
             stmt.setDouble(5, product.getPrice());
+            stmt.setInt(6, product.getMinStockLevel());
 
             stmt.executeUpdate();
 
@@ -91,7 +93,7 @@ public class AnimalDAO {
      * Updates an animal entry and its synced Product entry.
      */
     public static void updateAnimal(Product product) {
-        String sql = "UPDATE Animals SET product_name = ?, stock_quantity = ?, supplier = ?, price = ? WHERE animal_id = ?";
+        String sql = "UPDATE Animals SET product_name = ?, stock_quantity = ?, supplier = ?, price = ?, min_stock_level = ? WHERE animal_id = ?";
 
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -100,7 +102,8 @@ public class AnimalDAO {
             stmt.setInt(2, product.getStockQuantity());
             stmt.setString(3, product.getSupplier());
             stmt.setDouble(4, product.getPrice());
-            stmt.setInt(5, product.getId());
+            stmt.setInt(5, product.getMinStockLevel());
+            stmt.setInt(6, product.getId());
 
             stmt.executeUpdate();
             ProductDAO.updateProduct(product); // Sync

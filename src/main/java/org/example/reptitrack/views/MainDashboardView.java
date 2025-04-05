@@ -36,7 +36,9 @@ public class MainDashboardView {
 
         // Total & Low-Stock Labels
         int totalItems = allProducts.stream().mapToInt(Product::getStockQuantity).sum();
-        long lowStockCount = allProducts.stream().filter(p -> p.getStockQuantity() < 5).count();
+        long lowStockCount = allProducts.stream()
+                .filter(p -> p.getStockQuantity() < p.getMinStockLevel())
+                .count();
 
         Label totalItemsLabelText = new Label("Total Items in Inventory:");
         Label totalItemsLabel = new Label(String.valueOf(totalItems));

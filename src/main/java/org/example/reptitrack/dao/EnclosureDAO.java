@@ -23,7 +23,8 @@ public class EnclosureDAO {
                         "Enclosures",
                         rs.getInt("stock_quantity"),
                         rs.getString("supplier"),
-                        rs.getDouble("price")
+                        rs.getDouble("price"),
+                        rs.getInt("min_stock_level")
                 );
                 enclosures.add(product);
             }
@@ -36,7 +37,7 @@ public class EnclosureDAO {
     }
 
     public static void insertEnclosure(Product product) {
-        String sql = "INSERT INTO Enclosures (product_name, category, stock_quantity, supplier, price) VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO Enclosures (product_name, category, stock_quantity, supplier, price, min_stock_level) VALUES (?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -46,6 +47,7 @@ public class EnclosureDAO {
             stmt.setInt(3, product.getStockQuantity());
             stmt.setString(4, product.getSupplier());
             stmt.setDouble(5, product.getPrice());
+            stmt.setInt(6, product.getMinStockLevel());
 
             stmt.executeUpdate();
 
@@ -65,7 +67,7 @@ public class EnclosureDAO {
     }
 
     public static void updateEnclosure(Product product) {
-        String sql = "UPDATE Enclosures SET product_name = ?, stock_quantity = ?, supplier = ?, price = ? WHERE enclosure_id = ?";
+        String sql = "UPDATE Enclosures SET product_name = ?, stock_quantity = ?, supplier = ?, price = ?, min_stock_level = ? WHERE enclosure_id = ?";
 
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -74,7 +76,8 @@ public class EnclosureDAO {
             stmt.setInt(2, product.getStockQuantity());
             stmt.setString(3, product.getSupplier());
             stmt.setDouble(4, product.getPrice());
-            stmt.setInt(5, product.getId());
+            stmt.setInt(5, product.getMinStockLevel());
+            stmt.setInt(6, product.getId());
 
             stmt.executeUpdate();
             ProductDAO.updateProduct(product);

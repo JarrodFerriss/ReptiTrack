@@ -19,6 +19,7 @@ public class EditProductView {
         TextField quantityField = new TextField(String.valueOf(product.getStockQuantity()));
         TextField supplierField = new TextField(product.getSupplier());
         TextField priceField = new TextField(String.valueOf(product.getPrice()));
+        TextField minStockField = new TextField(String.valueOf(product.getMinStockLevel()));
 
         Label errorLabel = new Label();
         errorLabel.setStyle("-fx-text-fill: red;");
@@ -30,6 +31,7 @@ public class EditProductView {
                 product.setStockQuantity(Integer.parseInt(quantityField.getText().trim()));
                 product.setSupplier(supplierField.getText().trim());
                 product.setPrice(Double.parseDouble(priceField.getText().trim()));
+                product.setMinStockLevel(Integer.parseInt(minStockField.getText().trim()));
 
                 switch (category.toLowerCase()) {
                     case "animals" -> AnimalDAO.updateAnimal(product);
@@ -49,7 +51,17 @@ public class EditProductView {
         Button cancelButton = new Button("Cancel");
         cancelButton.setOnAction(e -> stage.setScene(AdminTerminalView.createAdminScene(stage)));
 
-        VBox layout = new VBox(10, titleLabel, nameField, quantityField, supplierField, priceField, errorLabel, saveButton, cancelButton);
+        VBox layout = new VBox(10,
+                titleLabel,
+                nameField,
+                quantityField,
+                supplierField,
+                priceField,
+                minStockField,
+                errorLabel,
+                saveButton,
+                cancelButton
+        );
         layout.setAlignment(Pos.CENTER);
         layout.setPadding(new Insets(20));
         layout.setPrefWidth(400);
