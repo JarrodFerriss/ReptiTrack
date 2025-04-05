@@ -14,12 +14,13 @@ import javafx.stage.Stage;
 import org.example.reptitrack.MainApplication;
 import org.example.reptitrack.dao.ProductDAO;
 import org.example.reptitrack.models.Product;
+import org.example.reptitrack.services.CartService;
 
 public class MainDashboardView {
 
     private static TableView<Product> productTable;
     private static TableView<Product> cartTable;
-    private static final ObservableList<Product> cartItems = FXCollections.observableArrayList();
+    private static final ObservableList<Product> cartItems = CartService.getInstance().getCartItems();
     private static final Label cartTotalLabel = new Label("Total: $0.00");
 
     public static Scene createMainScene(Stage stage) {
@@ -44,30 +45,8 @@ public class MainDashboardView {
             TableRow<Product> row = new TableRow<>();
             row.setOnMouseClicked(event -> {
                 if (event.getClickCount() == 2 && !row.isEmpty()) {
-                    Product clicked = row.getItem();
-                    boolean found = false;
-
-                    for (Product item : cartItems) {
-                        if (item.getId() == clicked.getId()) {
-                            item.setStockQuantity(item.getStockQuantity() + 1);
-                            cartTable.refresh();
-                            found = true;
-                            break;
-                        }
-                    }
-
-                    if (!found) {
-                        cartItems.add(new Product(
-                                clicked.getId(),
-                                clicked.getProductName(),
-                                clicked.getCategory(),
-                                1,
-                                clicked.getSupplier(),
-                                clicked.getPrice(),
-                                clicked.getMinStockLevel()
-                        ));
-                    }
-
+                    CartService.getInstance().addItem(row.getItem());
+                    cartTable.refresh();
                     updateCartTotal();
                 }
             });
@@ -88,21 +67,28 @@ public class MainDashboardView {
         removeItemButton.setOnAction(e -> {
             Product selected = cartTable.getSelectionModel().getSelectedItem();
             if (selected != null) {
-                cartItems.remove(selected);
+                CartService.getInstance().removeItem(selected);
+                cartTable.refresh();
                 updateCartTotal();
             }
         });
 
         Button clearCartButton = new Button("Clear Cart");
         clearCartButton.setOnAction(e -> {
-            cartItems.clear();
+            CartService.getInstance().clearCart();
+            cartTable.refresh();
             updateCartTotal();
         });
 
         Button proceedButton = new Button("Proceed to Checkout");
         proceedButton.setOnAction(e -> {
-            Alert alert = new Alert(Alert.AlertType.INFORMATION, "Proceeding to checkout!", ButtonType.OK);
-            alert.showAndWait();
+            if (CartService.getInstance().isEmpty()) {
+                Alert alert = new Alert(Alert.AlertType.ERROR, "Your cart is empty. Please add items before proceeding.", ButtonType.OK);
+                alert.setHeaderText("Cart is Empty");
+                alert.showAndWait();
+            } else {
+                MainApplication.setRoot("Checkout");
+            }
         });
 
         HBox cartControls = new HBox(10, removeItemButton, clearCartButton, proceedButton);
@@ -180,10 +166,7 @@ public class MainDashboardView {
     }
 
     private static void updateCartTotal() {
-        double total = 0.0;
-        for (Product item : cartItems) {
-            total += item.getPrice() * item.getStockQuantity();
-        }
+        double total = CartService.getInstance().getCartTotal();
         cartTotalLabel.setText(String.format("Total: $%.2f", total));
     }
 

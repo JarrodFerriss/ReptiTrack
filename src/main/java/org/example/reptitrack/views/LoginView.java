@@ -36,7 +36,7 @@ public class LoginView {
                 statusLabel.setText("✅ Login successful!");
                 MainApplication.setRoot("MainDashboard");
             } else {
-                statusLabel.setText("❌ Invalid credentials. Try again.");
+                statusLabel.setText("❌ Invalid credentials");
             }
         });
 
