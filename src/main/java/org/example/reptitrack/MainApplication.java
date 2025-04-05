@@ -36,7 +36,7 @@ public class MainApplication extends Application {
             // 🔐 Start with LoginView instead of Dashboard
             Scene scene = org.example.reptitrack.views.LoginView.createLoginScene(stage);
             primaryStage.setScene(scene);
-            primaryStage.setTitle("ReptiTrack - Login");
+            primaryStage.setTitle("ReptiTrack");
             primaryStage.show();
 
             System.out.println("🪟 Login window displayed successfully.");
@@ -47,7 +47,7 @@ public class MainApplication extends Application {
             Label fallbackLabel = new Label("Critical Error: Unable to load UI.");
             Scene fallbackScene = new Scene(fallbackLabel, 400, 200);
             primaryStage.setScene(fallbackScene);
-            primaryStage.setTitle("ReptiTrack - Error");
+            primaryStage.setTitle("ReptiTrack");
             primaryStage.show();
         }
     }

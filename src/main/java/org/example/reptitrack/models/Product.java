@@ -5,10 +5,10 @@ package org.example.reptitrack.models;
  * Includes product ID, name, quantity, supplier name, and price.
  */
 public class Product {
-    private int id;               // Maps to animal_id, product_id, etc.
-    private String productName;   // Maps to product_name
-    private String category;      // Optional, maps to category
-    private int stockQuantity;    // Maps to stock_quantity
+    private int id;
+    private String productName;
+    private String category;
+    private int stockQuantity;
     private String supplier;
     private double price;
 
