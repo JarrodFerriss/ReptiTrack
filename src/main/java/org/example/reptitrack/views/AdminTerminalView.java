@@ -16,9 +16,10 @@ import org.example.reptitrack.models.Product;
 public class AdminTerminalView {
 
     public static Scene createAdminScene(Stage stage) {
-        TabPane tabPane = new TabPane();
+        Label titleLabel = new Label("ReptiTrack - Admin Terminal");
+        titleLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
 
-        // Each tab uses correct DAO
+        TabPane tabPane = new TabPane();
         tabPane.getTabs().add(createProductTab("Animals", FXCollections.observableArrayList(AnimalDAO.getAllAnimals()), stage));
         tabPane.getTabs().add(createProductTab("Enclosures", FXCollections.observableArrayList(EnclosureDAO.getAllEnclosures()), stage));
         tabPane.getTabs().add(createProductTab("Feeders", FXCollections.observableArrayList(FeederDAO.getAllFeeders()), stage));
@@ -27,12 +28,18 @@ public class AdminTerminalView {
         Button backBtn = new Button("Back to Dashboard");
         backBtn.setOnAction(e -> MainApplication.setRoot("MainDashboard"));
 
-        VBox layout = new VBox(10, tabPane, backBtn);
-        layout.setPadding(new Insets(20));
-        layout.setPrefSize(1000, 700);
-        layout.setAlignment(Pos.TOP_CENTER);
+        HBox bottomBar = new HBox(backBtn);
+        bottomBar.setAlignment(Pos.CENTER_LEFT);
+        bottomBar.setPadding(new Insets(10, 0, 0, 10));
 
-        return new Scene(layout);
+        VBox layout = new VBox(10, titleLabel, tabPane, bottomBar);
+        layout.setAlignment(Pos.TOP_CENTER);
+        layout.setPadding(new Insets(15));
+
+        Scene scene = new Scene(layout);
+        stage.setResizable(false);
+        stage.sizeToScene();
+        return scene;
     }
 
     private static Tab createProductTab(String title, ObservableList<Product> data, Stage stage) {
@@ -68,14 +75,12 @@ public class AdminTerminalView {
                     case "feeders" -> FeederDAO.deleteFeeder(selected.getId());
                     case "supplies" -> SupplyDAO.deleteSupply(selected.getId());
                 }
-                // Refresh table
                 table.setItems(getFreshData(title));
             }
         });
 
         HBox controls = new HBox(10, addButton, editButton, deleteButton);
         controls.setAlignment(Pos.CENTER);
-
         VBox content = new VBox(10, table, controls);
         content.setAlignment(Pos.CENTER);
         content.setPadding(new Insets(10));

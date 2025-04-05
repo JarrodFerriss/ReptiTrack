@@ -4,7 +4,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import org.example.reptitrack.dao.*;
 import org.example.reptitrack.models.Product;
@@ -13,8 +13,9 @@ public class AddProductView {
 
     public static Scene createScene(Stage stage, String category) {
         Label titleLabel = new Label("Add New Product to " + category);
-        titleLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
+        titleLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
 
+        // Form Fields
         TextField nameField = new TextField();
         nameField.setPromptText("Product Name");
 
@@ -33,6 +34,11 @@ public class AddProductView {
         Label errorLabel = new Label();
         errorLabel.setStyle("-fx-text-fill: red;");
 
+        VBox formBox = new VBox(10, nameField, quantityField, supplierField, priceField, minStockField, errorLabel);
+        formBox.setAlignment(Pos.CENTER);
+        formBox.setPadding(new Insets(10));
+
+        // Buttons
         Button saveButton = new Button("Save");
         saveButton.setOnAction(e -> {
             try {
@@ -53,7 +59,6 @@ public class AddProductView {
                 }
 
                 stage.setScene(AdminTerminalView.createAdminScene(stage));
-
             } catch (Exception ex) {
                 errorLabel.setText("❌ Invalid input: " + ex.getMessage());
             }
@@ -62,8 +67,12 @@ public class AddProductView {
         Button cancelButton = new Button("Cancel");
         cancelButton.setOnAction(e -> stage.setScene(AdminTerminalView.createAdminScene(stage)));
 
-        VBox layout = new VBox(10, titleLabel, nameField, quantityField, supplierField, priceField, minStockField, errorLabel, saveButton, cancelButton);
-        layout.setAlignment(Pos.CENTER);
+        HBox buttonBar = new HBox(10, saveButton, cancelButton);
+        buttonBar.setAlignment(Pos.CENTER);
+        buttonBar.setPadding(new Insets(10, 0, 0, 0));
+
+        VBox layout = new VBox(15, titleLabel, formBox, buttonBar);
+        layout.setAlignment(Pos.TOP_CENTER);
         layout.setPadding(new Insets(20));
         layout.setPrefWidth(400);
 

@@ -4,7 +4,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import org.example.reptitrack.MainApplication;
 import org.example.reptitrack.dao.UserDAO;
@@ -12,17 +12,20 @@ import org.example.reptitrack.dao.UserDAO;
 public class LoginView {
 
     public static Scene createLoginScene(Stage stage) {
-        Label titleLabel = new Label("ReptiTrack - Admin Login");
+        Label titleLabel = new Label("ReptiTrack - Login");
         titleLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
 
+        // Username and password fields
         TextField usernameField = new TextField();
         usernameField.setPromptText("Username");
 
         PasswordField passwordField = new PasswordField();
         passwordField.setPromptText("Password");
 
-        Label statusLabel = new Label(); // For error/success messages
+        // Status label for login feedback
+        Label statusLabel = new Label();
 
+        // Login button
         Button loginButton = new Button("Login");
         loginButton.setOnAction(event -> {
             String username = usernameField.getText();
@@ -37,11 +40,23 @@ public class LoginView {
             }
         });
 
-        VBox layout = new VBox(10, titleLabel, usernameField, passwordField, loginButton, statusLabel);
-        layout.setAlignment(Pos.CENTER);
-        layout.setPadding(new Insets(20));
-        layout.setPrefSize(400, 300);
+        VBox formBox = new VBox(10, usernameField, passwordField, loginButton, statusLabel);
+        formBox.setAlignment(Pos.CENTER);
+        formBox.setPadding(new Insets(20));
 
-        return new Scene(layout);
+        Region spacerTop = new Region();
+        HBox.setHgrow(spacerTop, Priority.ALWAYS);
+
+        HBox headerBar = new HBox(10);
+        headerBar.setPadding(new Insets(0, 10, 10, 10));
+
+        VBox layout = new VBox(10, titleLabel, headerBar, formBox);
+        layout.setAlignment(Pos.TOP_CENTER);
+        layout.setPadding(new Insets(15));
+
+        Scene scene = new Scene(layout);
+        stage.setResizable(false);
+        stage.sizeToScene();
+        return scene;
     }
 }
