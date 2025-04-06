@@ -10,7 +10,13 @@ public class FeederDAO {
 
     public static List<Product> getAllFeeders() {
         List<Product> feeders = new ArrayList<>();
-        String sql = "SELECT * FROM Feeders";
+
+        String sql = """
+            SELECT f.feeder_id, p.product_id, p.product_name, p.category, 
+                   p.stock_quantity, p.supplier, p.price, p.min_stock_level
+            FROM Feeders f
+            JOIN Products p ON f.product_id = p.product_id
+        """;
 
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql);
@@ -18,7 +24,7 @@ public class FeederDAO {
 
             while (rs.next()) {
                 Product product = new Product(
-                        rs.getInt("feeder_id"),
+                        rs.getInt("product_id"),
                         rs.getString("product_name"),
                         "Feeders",
                         rs.getInt("stock_quantity"),
@@ -37,29 +43,18 @@ public class FeederDAO {
     }
 
     public static void insertFeeder(Product product) {
-        String sql = "INSERT INTO Feeders (product_name, category, stock_quantity, supplier, price, min_stock_level) VALUES (?, ?, ?, ?, ?, ?)";
+        int productId = ProductDAO.insertProductAndReturnId(product);
+
+        String sql = "INSERT INTO Feeders (product_name, product_id) VALUES (?, ?)";
 
         try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, product.getProductName());
-            stmt.setString(2, product.getCategory());
-            stmt.setInt(3, product.getStockQuantity());
-            stmt.setString(4, product.getSupplier());
-            stmt.setDouble(5, product.getPrice());
-            stmt.setInt(6, product.getMinStockLevel());
+            stmt.setInt(2, productId);
 
             stmt.executeUpdate();
-
-            try (ResultSet keys = stmt.getGeneratedKeys()) {
-                if (keys.next()) {
-                    product.setId(keys.getInt(1));
-                    product.setCategory("Feeders");
-                    ProductDAO.insertProduct(product);
-                }
-            }
-
-            System.out.println("✅ Feeder added and synced to Products.");
+            System.out.println("✅ Feeder added to Feeders and Products.");
 
         } catch (SQLException e) {
             System.err.println("❌ Failed to insert feeder: " + e.getMessage());
@@ -67,39 +62,34 @@ public class FeederDAO {
     }
 
     public static void updateFeeder(Product product) {
-        String sql = "UPDATE Feeders SET product_name = ?, stock_quantity = ?, supplier = ?, price = ?, min_stock_level = ? WHERE feeder_id = ?";
+        ProductDAO.updateProduct(product);
+
+        String sql = "UPDATE Feeders SET product_name = ? WHERE product_id = ?";
 
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, product.getProductName());
-            stmt.setInt(2, product.getStockQuantity());
-            stmt.setString(3, product.getSupplier());
-            stmt.setDouble(4, product.getPrice());
-            stmt.setInt(5, product.getMinStockLevel());
-            stmt.setInt(6, product.getId());
+            stmt.setInt(2, product.getId());
 
             stmt.executeUpdate();
-            ProductDAO.updateProduct(product);
-
-            System.out.println("✅ Feeder updated and synced to Products.");
+            System.out.println("✅ Feeder updated in Feeders and Products.");
 
         } catch (SQLException e) {
             System.err.println("❌ Failed to update feeder: " + e.getMessage());
         }
     }
 
-    public static void deleteFeeder(int id) {
-        String sql = "DELETE FROM Feeders WHERE feeder_id = ?";
+    public static void deleteFeeder(int productId) {
+        String sql = "DELETE FROM Feeders WHERE product_id = ?";
 
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setInt(1, id);
+            stmt.setInt(1, productId);
             stmt.executeUpdate();
-            ProductDAO.deleteProductById(id);
-
-            System.out.println("🗑️ Feeder deleted and removed from Products.");
+            ProductDAO.deleteProductById(productId);
+            System.out.println("🗑️ Feeder deleted from Feeders and Products.");
 
         } catch (SQLException e) {
             System.err.println("❌ Failed to delete feeder: " + e.getMessage());

@@ -1,5 +1,7 @@
 package org.example.reptitrack.models;
 
+import org.example.reptitrack.dao.ProductDAO;
+
 /**
  * Represents an inventory product in the ReptiTrack system.
  * Includes product ID, name, quantity, supplier name, and price.
@@ -21,6 +23,10 @@ public class Product {
         this.supplier = supplier;
         this.price = price;
         this.minStockLevel = minStockLevel;
+    }
+
+    public int getStockQuantityInDB() {
+        return ProductDAO.getQuantityById(this.id);
     }
 
     // Getters and setters

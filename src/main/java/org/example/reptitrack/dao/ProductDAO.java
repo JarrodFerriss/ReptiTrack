@@ -8,7 +8,6 @@ import java.util.List;
 
 /**
  * Handles direct access to the 'Products' table only.
- * Category-specific logic should be handled in their respective DAOs (Animals, Enclosures, etc).
  */
 public class ProductDAO {
 
@@ -16,9 +15,6 @@ public class ProductDAO {
     // READ
     // ─────────────────────────────────────────────────────────────
 
-    /**
-     * Returns all products from the Products table.
-     */
     public static List<Product> getAllProducts() {
         List<Product> products = new ArrayList<>();
         String sql = "SELECT * FROM Products";
@@ -47,13 +43,25 @@ public class ProductDAO {
         return products;
     }
 
+    public static int getQuantityById(int productId) {
+        String query = "SELECT stock_quantity FROM Products WHERE product_id = ?";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setInt(1, productId);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt("stock_quantity");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
     // ─────────────────────────────────────────────────────────────
     // CREATE
     // ─────────────────────────────────────────────────────────────
 
-    /**
-     * Inserts a new product into the Products table.
-     */
     public static void insertProduct(Product product) {
         String sql = "INSERT INTO Products (product_name, category, stock_quantity, supplier, price, min_stock_level) VALUES (?, ?, ?, ?, ?, ?)";
 
@@ -75,13 +83,38 @@ public class ProductDAO {
         }
     }
 
+    public static int insertProductAndReturnId(Product product) {
+        String sql = "INSERT INTO Products (product_name, category, stock_quantity, supplier, price, min_stock_level) VALUES (?, ?, ?, ?, ?, ?)";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+
+            stmt.setString(1, product.getProductName());
+            stmt.setString(2, product.getCategory());
+            stmt.setInt(3, product.getStockQuantity());
+            stmt.setString(4, product.getSupplier());
+            stmt.setDouble(5, product.getPrice());
+            stmt.setInt(6, product.getMinStockLevel());
+
+            stmt.executeUpdate();
+
+            ResultSet rs = stmt.getGeneratedKeys();
+            if (rs.next()) {
+                int generatedId = rs.getInt(1);
+                System.out.println("✅ Product inserted with ID: " + generatedId);
+                return generatedId;
+            }
+
+        } catch (SQLException e) {
+            System.err.println("❌ Failed to insert and fetch product ID: " + e.getMessage());
+        }
+        return -1;
+    }
+
     // ─────────────────────────────────────────────────────────────
     // UPDATE
     // ─────────────────────────────────────────────────────────────
 
-    /**
-     * Updates an existing product in the Products table.
-     */
     public static void updateProduct(Product product) {
         String sql = "UPDATE Products SET product_name = ?, category = ?, stock_quantity = ?, supplier = ?, price = ?, min_stock_level = ? WHERE product_id = ?";
 
@@ -108,9 +141,6 @@ public class ProductDAO {
     // DELETE
     // ─────────────────────────────────────────────────────────────
 
-    /**
-     * Deletes a product from the Products table by ID.
-     */
     public static void deleteProductById(int productId) {
         String sql = "DELETE FROM Products WHERE product_id = ?";
 

@@ -11,6 +11,11 @@ import javafx.geometry.Pos;
 import org.example.reptitrack.MainApplication;
 import org.example.reptitrack.models.Product;
 import org.example.reptitrack.services.CartService;
+import org.example.reptitrack.dao.AnimalDAO;
+import org.example.reptitrack.dao.EnclosureDAO;
+import org.example.reptitrack.dao.FeederDAO;
+import org.example.reptitrack.dao.SupplyDAO;
+import org.example.reptitrack.dao.ProductDAO;
 
 public class CheckoutView {
 
@@ -80,9 +85,69 @@ public class CheckoutView {
         // Buttons
         Button completeButton = new Button("Complete Sale");
         completeButton.setOnAction(e -> {
-            Alert alert = new Alert(Alert.AlertType.INFORMATION, "✅ Sale Completed!", ButtonType.OK);
-            alert.showAndWait();
-            // TODO: Clear cart, write to DB, etc.
+            double subtotal = cartTable.getItems().stream()
+                    .mapToDouble(p -> p.getPrice() * p.getStockQuantity())
+                    .sum();
+            double tax = subtotal * 0.13;
+            double total = subtotal + tax;
+
+            ChoiceDialog<String> paymentDialog = new ChoiceDialog<>("Cash", "Cash", "Card");
+            paymentDialog.setHeaderText("Select Payment Method");
+            paymentDialog.setContentText("Payment Type:");
+            paymentDialog.setTitle("Payment");
+
+            paymentDialog.showAndWait().ifPresent(method -> {
+                if (method.equals("Card")) {
+                    Alert cardAlert = new Alert(Alert.AlertType.INFORMATION,
+                            "Please finalize the sale on the card terminal.\n\nTotal: $" + String.format("%.2f", total),
+                            ButtonType.OK);
+                    cardAlert.setHeaderText("Card Payment");
+                    cardAlert.showAndWait();
+                    finishSale();
+
+                } else if (method.equals("Cash")) {
+                    TextInputDialog cashDialog = new TextInputDialog();
+                    cashDialog.setHeaderText("Enter Cash Received");
+                    cashDialog.setContentText("Amount received from customer ($):");
+                    cashDialog.setTitle("Cash Payment");
+
+                    cashDialog.showAndWait().ifPresent(input -> {
+                        try {
+                            double cashReceived = Double.parseDouble(input);
+
+                            // Round total to nearest $0.05
+                            double roundedTotal = Math.round(total * 20.0) / 20.0;
+
+                            if (cashReceived < roundedTotal) {
+                                Alert underpaid = new Alert(Alert.AlertType.ERROR,
+                                        "Customer did not provide enough cash.\nAmount due: $" + String.format("%.2f", roundedTotal),
+                                        ButtonType.OK);
+                                underpaid.setHeaderText("Insufficient Payment");
+                                underpaid.showAndWait();
+                                return;
+                            }
+
+                            double change = cashReceived - roundedTotal;
+                            // Round change to nearest $0.05
+                            double roundedChange = Math.round(change * 20.0) / 20.0;
+
+                            Alert changeAlert = new Alert(Alert.AlertType.INFORMATION,
+                                    String.format("✅ Sale Completed!\n\nAmount Received: $%.2f\nTotal Owing: $%.2f\nChange Due: $%.2f",
+                                            cashReceived, roundedTotal, roundedChange),
+                                    ButtonType.OK);
+                            changeAlert.setHeaderText("Cash Payment");
+                            changeAlert.showAndWait();
+
+                            finishSale();
+
+                        } catch (NumberFormatException ex) {
+                            Alert error = new Alert(Alert.AlertType.ERROR, "Invalid cash amount entered.", ButtonType.OK);
+                            error.setHeaderText("Input Error");
+                            error.showAndWait();
+                        }
+                    });
+                }
+            });
         });
 
         Button backButton = new Button("Back to Dashboard");
@@ -119,5 +184,31 @@ public class CheckoutView {
         subtotalLabel.setText(String.format("Subtotal: $%.2f", subtotal));
         taxLabel.setText(String.format("Tax (13%%): $%.2f", tax));
         totalLabel.setText(String.format("Total: $%.2f", total));
+    }
+
+    private static void finishSale() {
+        for (Product p : CartService.getInstance().getCartItems()) {
+            // 1. Reduce quantity
+            int currentQty = ProductDAO.getQuantityById(p.getId());
+            int updatedQty = Math.max(0, currentQty - p.getStockQuantity());
+            p.setStockQuantity(updatedQty);
+
+            // 2. Update product table
+            ProductDAO.updateProduct(p);
+
+            // 3. Update category table
+            switch (p.getCategory().toLowerCase()) {
+                case "animals" -> AnimalDAO.updateAnimal(p);
+                case "enclosures" -> EnclosureDAO.updateEnclosure(p);
+                case "feeders" -> FeederDAO.updateFeeder(p);
+                case "supplies" -> SupplyDAO.updateSupply(p);
+            }
+        }
+
+        CartService.getInstance().clearCart();
+        Alert thankYou = new Alert(Alert.AlertType.INFORMATION, "🧾 Receipt complete. Thank you!", ButtonType.OK);
+        thankYou.setHeaderText(null);
+        thankYou.showAndWait();
+        MainApplication.setRoot("MainDashboard");
     }
 }

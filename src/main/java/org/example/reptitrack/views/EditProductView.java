@@ -47,6 +47,8 @@ public class EditProductView {
                     default -> throw new IllegalArgumentException("Unsupported category: " + category);
                 }
 
+                ProductDAO.updateProduct(product);
+
                 stage.setScene(AdminTerminalView.createAdminScene(stage));
 
             } catch (Exception ex) {

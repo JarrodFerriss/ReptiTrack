@@ -12,16 +12,18 @@ import java.util.List;
  */
 public class AnimalDAO {
 
-    // ─────────────────────────────────────────────────────────────
+    // ───────────────────────────────
     // READ
-    // ─────────────────────────────────────────────────────────────
+    // ───────────────────────────────
 
-    /**
-     * Fetches all animal products.
-     */
     public static List<Product> getAllAnimals() {
         List<Product> animals = new ArrayList<>();
-        String sql = "SELECT * FROM Animals";
+        String sql = """
+            SELECT a.animal_id, p.product_id, p.product_name, p.stock_quantity, 
+                   p.supplier, p.price, p.min_stock_level
+            FROM Animals a
+            JOIN Products p ON a.product_id = p.product_id
+        """;
 
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql);
@@ -29,7 +31,7 @@ public class AnimalDAO {
 
             while (rs.next()) {
                 Product product = new Product(
-                        rs.getInt("animal_id"),
+                        rs.getInt("product_id"),
                         rs.getString("product_name"),
                         "Animals",
                         rs.getInt("stock_quantity"),
@@ -47,67 +49,45 @@ public class AnimalDAO {
         return animals;
     }
 
-    // ─────────────────────────────────────────────────────────────
+    // ───────────────────────────────
     // CREATE
-    // ─────────────────────────────────────────────────────────────
+    // ───────────────────────────────
 
-    /**
-     * Inserts a new animal product and syncs with Products.
-     */
     public static void insertAnimal(Product product) {
-        String sql = "INSERT INTO Animals (product_name, category, stock_quantity, supplier, price, min_stock_level) VALUES (?, ?, ?, ?, ?, ?)";
+        int productId = ProductDAO.insertProductAndReturnId(product);
+
+        String sql = "INSERT INTO Animals (product_name, product_id) VALUES (?, ?)";
 
         try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, product.getProductName());
-            stmt.setString(2, product.getCategory());
-            stmt.setInt(3, product.getStockQuantity());
-            stmt.setString(4, product.getSupplier());
-            stmt.setDouble(5, product.getPrice());
-            stmt.setInt(6, product.getMinStockLevel());
+            stmt.setInt(2, productId);
 
             stmt.executeUpdate();
-
-            try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
-                if (generatedKeys.next()) {
-                    int animalId = generatedKeys.getInt(1);
-                    product.setId(animalId);
-                    product.setCategory("Animals");
-                    ProductDAO.insertProduct(product); // Sync
-                }
-            }
-
-            System.out.println("✅ Animal added to Animals and Products.");
+            System.out.println("✅ Animal added to Animals and Products (linked by product_id = " + productId + ")");
 
         } catch (SQLException e) {
             System.err.println("❌ Failed to insert animal: " + e.getMessage());
         }
     }
 
-    // ─────────────────────────────────────────────────────────────
+    // ───────────────────────────────
     // UPDATE
-    // ─────────────────────────────────────────────────────────────
+    // ───────────────────────────────
 
-    /**
-     * Updates an animal entry and its synced Product entry.
-     */
     public static void updateAnimal(Product product) {
-        String sql = "UPDATE Animals SET product_name = ?, stock_quantity = ?, supplier = ?, price = ?, min_stock_level = ? WHERE animal_id = ?";
+        ProductDAO.updateProduct(product);
+
+        String sql = "UPDATE Animals SET product_name = ? WHERE product_id = ?";
 
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, product.getProductName());
-            stmt.setInt(2, product.getStockQuantity());
-            stmt.setString(3, product.getSupplier());
-            stmt.setDouble(4, product.getPrice());
-            stmt.setInt(5, product.getMinStockLevel());
-            stmt.setInt(6, product.getId());
+            stmt.setInt(2, product.getId());
 
             stmt.executeUpdate();
-            ProductDAO.updateProduct(product); // Sync
-
             System.out.println("✅ Animal updated in Animals and Products.");
 
         } catch (SQLException e) {
@@ -115,23 +95,20 @@ public class AnimalDAO {
         }
     }
 
-    // ─────────────────────────────────────────────────────────────
+    // ───────────────────────────────
     // DELETE
-    // ─────────────────────────────────────────────────────────────
+    // ───────────────────────────────
 
-    /**
-     * Deletes an animal by ID and removes from Products.
-     */
-    public static void deleteAnimal(int animalId) {
-        String sql = "DELETE FROM Animals WHERE animal_id = ?";
+    public static void deleteAnimal(int productId) {
+        String sql = "DELETE FROM Animals WHERE product_id = ?";
 
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setInt(1, animalId);
+            stmt.setInt(1, productId);
             stmt.executeUpdate();
 
-            ProductDAO.deleteProductById(animalId); // Sync
+            ProductDAO.deleteProductById(productId);
             System.out.println("🗑️ Animal deleted from Animals and Products.");
 
         } catch (SQLException e) {

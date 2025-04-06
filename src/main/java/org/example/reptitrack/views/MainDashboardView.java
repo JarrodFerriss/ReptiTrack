@@ -101,7 +101,7 @@ public class MainDashboardView {
 
         // Low-Stock Alerts Section
         long lowStockCount = allProducts.stream()
-                .filter(p -> p.getStockQuantity() < p.getMinStockLevel())
+                .filter(p -> p.getStockQuantity() <= p.getMinStockLevel())
                 .count();
 
         Label lowStockLabelText = new Label("Low-Stock Alerts:");
@@ -184,7 +184,7 @@ public class MainDashboardView {
         lowStockStage.setTitle("Low Stock Items");
 
         TableView<Product> lowStockTable = new TableView<>();
-        ObservableList<Product> lowStockItems = allProducts.filtered(p -> p.getStockQuantity() < p.getMinStockLevel());
+        ObservableList<Product> lowStockItems = allProducts.filtered(p -> p.getStockQuantity() <= p.getMinStockLevel());
 
         lowStockTable.setItems(lowStockItems);
         lowStockTable.getColumns().addAll(

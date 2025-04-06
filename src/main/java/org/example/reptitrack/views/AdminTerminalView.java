@@ -75,6 +75,7 @@ public class AdminTerminalView {
                     case "feeders" -> FeederDAO.deleteFeeder(selected.getId());
                     case "supplies" -> SupplyDAO.deleteSupply(selected.getId());
                 }
+                ProductDAO.deleteProductById(selected.getId());
                 table.setItems(getFreshData(title));
             }
         });
