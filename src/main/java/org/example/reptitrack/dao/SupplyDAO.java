@@ -45,13 +45,17 @@ public class SupplyDAO {
     public static void insertSupply(Product product) {
         int productId = ProductDAO.insertProductAndReturnId(product);
 
-        String sql = "INSERT INTO Supplies (product_name, product_id) VALUES (?, ?)";
+        String sql = "INSERT INTO Supplies (product_name, category, stock_quantity, supplier, price, min_stock_level) VALUES (?, ?, ?, ? ,?, ?)";
 
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, product.getProductName());
-            stmt.setInt(2, productId);
+            stmt.setString(2, product.getCategory());
+            stmt.setInt(3, product.getStockQuantity());
+            stmt.setString(4, product.getSupplier());
+            stmt.setDouble(5, product.getPrice());
+            stmt.setInt(6, product.getMinStockLevel());
 
             stmt.executeUpdate();
             System.out.println("✅ Supply added to Supplies and Products.");
@@ -64,13 +68,18 @@ public class SupplyDAO {
     public static void updateSupply(Product product) {
         ProductDAO.updateProduct(product);
 
-        String sql = "UPDATE Supplies SET product_name = ? WHERE product_id = ?";
+        String sql = "UPDATE Supplies SET product_name = ?, category = ?, stock_quantity = ?, supplier = ?, price = ?, min_stock_level = ? WHERE product_id = ?";
 
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, product.getProductName());
-            stmt.setInt(2, product.getId());
+            stmt.setString(2, product.getCategory());
+            stmt.setInt(3, product.getStockQuantity());
+            stmt.setString(4, product.getSupplier());
+            stmt.setDouble(5, product.getPrice());
+            stmt.setInt(6, product.getMinStockLevel());
+            stmt.setInt(7, product.getId());
 
             stmt.executeUpdate();
             System.out.println("✅ Supply updated in Supplies and Products.");
