@@ -5,14 +5,24 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+/**
+ * DAO class responsible for user authentication.
+ *
+ * Provides a method to verify credentials against the Users table.
+ * This version uses plaintext passwords for simplicity.
+ * In a production app, use hashing and secure comparison.
+ *
+ * @author Jarrod
+ * @since 2025-04-06
+ */
 public class UserDAO {
 
     /**
-     * Checks if a user with the given credentials exists in the database.
+     * Validates the provided username and password against the database.
      *
-     * @param username The username entered
-     * @param password The password entered (plaintext for now)
-     * @return true if credentials are valid, false otherwise
+     * @param username the username entered by the user
+     * @param password the plaintext password entered
+     * @return true if valid credentials were found, false otherwise
      */
     public static boolean authenticate(String username, String password) {
         String sql = "SELECT * FROM Users WHERE username = ? AND password = ?";
@@ -24,7 +34,7 @@ public class UserDAO {
             stmt.setString(2, password);
 
             try (ResultSet rs = stmt.executeQuery()) {
-                return rs.next(); // ✅ returns true if user is found
+                return rs.next(); // ✅ Valid login if a result exists
             }
 
         } catch (SQLException e) {

@@ -9,13 +9,28 @@ import javafx.stage.Stage;
 import org.example.reptitrack.dao.*;
 import org.example.reptitrack.models.Product;
 
+/**
+ * View for adding a new product to the system.
+ * Inserts the product into both the category table and the Products table.
+ * Returns to the Admin Terminal after submission or cancellation.
+ *
+ * @author Jarrod
+ * @since 2025-04-06
+ */
 public class AddProductView {
 
+    /**
+     * Generates the scene for creating a new product under a specific category.
+     *
+     * @param stage    the main stage
+     * @param category the category to which the product is being added
+     * @return the assembled JavaFX Scene
+     */
     public static Scene createScene(Stage stage, String category) {
         Label titleLabel = new Label("Add New Product to " + category);
         titleLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
 
-        // Form Fields
+        // ─────────────── Form Inputs ───────────────
         TextField nameField = new TextField();
         nameField.setPromptText("Product Name");
 
@@ -34,11 +49,12 @@ public class AddProductView {
         Label errorLabel = new Label();
         errorLabel.setStyle("-fx-text-fill: red;");
 
-        VBox formBox = new VBox(10, nameField, quantityField, supplierField, priceField, minStockField, errorLabel);
+        VBox formBox = new VBox(10,
+                nameField, quantityField, supplierField, priceField, minStockField, errorLabel);
         formBox.setAlignment(Pos.CENTER);
         formBox.setPadding(new Insets(10));
 
-        // Buttons
+        // ─────────────── Action Buttons ───────────────
         Button saveButton = new Button("Save");
         saveButton.setOnAction(e -> {
             try {
@@ -71,6 +87,7 @@ public class AddProductView {
         buttonBar.setAlignment(Pos.CENTER);
         buttonBar.setPadding(new Insets(10, 0, 0, 0));
 
+        // ─────────────── Layout Assembly ───────────────
         VBox layout = new VBox(15, titleLabel, formBox, buttonBar);
         layout.setAlignment(Pos.TOP_CENTER);
         layout.setPadding(new Insets(20));

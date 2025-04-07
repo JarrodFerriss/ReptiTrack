@@ -16,6 +16,13 @@ import org.example.reptitrack.dao.ProductDAO;
 import org.example.reptitrack.models.Product;
 import org.example.reptitrack.services.CartService;
 
+/**
+ * Main dashboard view that allows users to browse products,
+ * manage the shopping cart, and navigate through the application.
+ *
+ * @author Jarrod
+ * @since 2025-04-06
+ */
 public class MainDashboardView {
 
     private static TableView<Product> productTable;
@@ -23,6 +30,12 @@ public class MainDashboardView {
     private static final ObservableList<Product> cartItems = CartService.getInstance().getCartItems();
     private static final Label cartTotalLabel = new Label("Total: $0.00");
 
+    /**
+     * Creates and returns the main dashboard scene.
+     *
+     * @param stage the main stage
+     * @return JavaFX scene containing the dashboard UI
+     */
     public static Scene createMainScene(Stage stage) {
         Label titleLabel = new Label("ReptiTrack - Main Dashboard");
         titleLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
@@ -41,6 +54,7 @@ public class MainDashboardView {
                 createColumn("Price", "price", 100)
         );
 
+        // Double-click to add to cart
         productTable.setRowFactory(tv -> {
             TableRow<Product> row = new TableRow<>();
             row.setOnMouseClicked(event -> {
@@ -62,7 +76,7 @@ public class MainDashboardView {
                 createColumn("Price", "price", 80)
         );
 
-        // Cart Controls
+        // Cart Buttons
         Button removeItemButton = new Button("Remove Selected");
         removeItemButton.setOnAction(e -> {
             Product selected = cartTable.getSelectionModel().getSelectedItem();
@@ -99,7 +113,7 @@ public class MainDashboardView {
         tableWrapper.setAlignment(Pos.TOP_LEFT);
         tableWrapper.setPadding(new Insets(10));
 
-        // Low-Stock Alerts Section
+        // Low Stock Alerts
         long lowStockCount = allProducts.stream()
                 .filter(p -> p.getStockQuantity() <= p.getMinStockLevel())
                 .count();
@@ -131,7 +145,7 @@ public class MainDashboardView {
         HBox searchBox = new HBox(10, searchLabel, searchField, searchButton);
         searchBox.setAlignment(Pos.CENTER_RIGHT);
 
-        // Header Bar
+        // Header
         Region spacerTop = new Region();
         HBox.setHgrow(spacerTop, Priority.ALWAYS);
         HBox headerBar = new HBox(10, lowStockBox, spacerTop, searchBox);
@@ -151,10 +165,10 @@ public class MainDashboardView {
         HBox leftControls = new HBox(10, categoriesButton, adminButton, viewLowStockButton);
         Region spacerBottom = new Region();
         HBox.setHgrow(spacerBottom, Priority.ALWAYS);
-
         HBox bottomBar = new HBox(10, leftControls, spacerBottom);
         bottomBar.setPadding(new Insets(10, 10, 0, 10));
 
+        // Main Layout
         VBox layout = new VBox(10, titleLabel, headerBar, tableWrapper, bottomBar);
         layout.setAlignment(Pos.TOP_CENTER);
         layout.setPadding(new Insets(15));
@@ -165,11 +179,17 @@ public class MainDashboardView {
         return scene;
     }
 
+    /**
+     * Updates the cart total label based on current items in the cart.
+     */
     private static void updateCartTotal() {
         double total = CartService.getInstance().getCartTotal();
         cartTotalLabel.setText(String.format("Total: $%.2f", total));
     }
 
+    /**
+     * Helper to create a table column with the given title, property, and width.
+     */
     private static <T> TableColumn<Product, T> createColumn(String title, String property, int width) {
         TableColumn<Product, T> column = new TableColumn<>(title);
         column.setCellValueFactory(new PropertyValueFactory<>(property));
@@ -177,6 +197,9 @@ public class MainDashboardView {
         return column;
     }
 
+    /**
+     * Opens a modal window showing all low-stock items (qty ≤ min stock).
+     */
     private static void showLowStockWindow(Stage owner, ObservableList<Product> allProducts) {
         Stage lowStockStage = new Stage();
         lowStockStage.initModality(Modality.WINDOW_MODAL);
